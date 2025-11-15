@@ -10,6 +10,7 @@ const path = require('path');
 const passport = require('passport');
 const ejsmate = require('ejs-mate');
 const LocalStrategy = require('passport-local');
+const flash = require('connect-flash');
 const User = require('./models/user');
 
 const port = process.env.PORT || 3000;
@@ -44,8 +45,12 @@ const sessionOptions = {
         maxAge: 1000 * 60 * 60 * 24 *3, // 3 days
     }
 };
+app.get('/', (req, res) => {
+  res.send('This is root');
+});
 
 app.use(session(sessionOptions));
+app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -55,18 +60,11 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-app.get('/', (req, res) => {
-  res.send('This is root');
-});
-
-app.get('/demouser', async (req, res) => {
-    const user = new User({
-        username: 'demoUser', 
-        email: 'demoUser@example.com',
-        role: 'student'
-    });
-    const registeredUser = await User.register(user, 'demopassword');
-    res.send(registeredUser);
+app.use((req,res,next) => {
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+    res.locals.currUser = req.user;
+    next();
 });
 
 app.use('/', userRouter);
