@@ -1,0 +1,47 @@
+<% layout("/layouts/boilerplate") %>
+
+<h1 class="mb-3">User Management</h1>
+
+<a href="/admin/users/add" class="btn btn-primary mb-3">Add New User</a>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>#</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th style="width: 180px;">Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% users.forEach((u, index) => { %>
+            <% if (u.role !== "admin") { %>
+             
+            <tr>
+                <td><%= index + 1 %></td>
+                <td><%= u.username %></td>
+                <td><%= u.email %></td>
+                <td><%= u.role %></td>
+
+                <td>
+                    <a href="/users/<%= u._id %>/edit" class="btn btn-sm btn-warning">
+                        ✏️ Edit
+                    </a>
+
+                      <form action="/admin/users/<%= u._id %>?_method=DELETE" 
+                          method="POST" 
+                          style="display:inline;">
+                        <button class="btn btn-sm btn-danger"
+                                onclick="return confirm('Delete this user?')"
+                                type="submit">
+                                Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            <% } %>
+        <% }) %>
+    </tbody>
+</table>
